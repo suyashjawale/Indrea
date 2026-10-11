@@ -1,0 +1,46 @@
+<div class="container-fluid p-3">
+  <div class="row">
+    <!-- Left: Video Player -->
+    <div class="col-md-6 d-flex flex-column">
+      <h5>Video Preview</h5>
+      <video
+        #videoPlayer
+        width="100%"
+        height="auto"
+        controls
+        class="flex-grow-1"
+      >
+        <source [attr.src]="videoSrc" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <input
+        type="file"
+        (change)="onVideoUpload($event)"
+        accept="video/mp4"
+        class="form-control mt-2"
+      />
+    </div>
+
+    <!-- Right: EEG Chart -->
+    <div class="col-md-6 d-flex flex-column">
+      <h5>EEG Signal Preview</h5>
+      <div *ngIf="loading">Loading EEG data...</div>
+      <div
+        #eegChart
+        style="height: 600px; width: 100%"
+        *ngIf="!loading && eegData"
+      ></div>
+      <input
+        type="file"
+        (change)="onFileUpload($event)"
+        accept=".fif"
+        class="form-control mt-2"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="timeline-scroll-wrapper">
+  <app-timeline-crop [totalDuration]="videoDuration" (cropRange)="handleCrop($event)">
+</app-timeline-crop>
+</div>

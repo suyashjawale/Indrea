@@ -1,0 +1,378 @@
+<div class="container-fluid d-flex bg-gray" id="bg-div">
+	<div class="sticky-top flex-grow-1 custom-height vh-100 py-3">
+		<div class="d-flex flex-column rounded-3 shadow bg-white w-100 h-100 p-3 pb-0">
+			<div class="d-flex pb-2 justify-content-between">
+
+				<div class="d-flex">
+					<div class="fw-medium">SIGNAL VIEWER</div>
+					<div class="form-check form-switch ms-2">
+						<input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault"
+							[(ngModel)]="aggregatedView" (change)="changeView()">
+					</div>
+				</div>
+
+				<div class="d-flex gap-2">
+					<button class="btn btn-outline-dark border border-opacity-10 btn-sm"
+						(click)="openInNewTab(['topo','spectral','timeseries'])" [disabled]="!icaApplied">ICA
+						Plots
+						<i class="bi bi-box-arrow-in-up-right"></i></button>
+				</div>
+			</div>
+
+			<div class="flex-grow-1 border rounded h-100 w-100" [ngClass]="{'overflow-y-auto': !aggregatedView}">
+				<div id="signalViewer" class="h-100 w-100"></div>
+			</div>
+			<div class="d-flex justify-content-between py-3">
+				<button class="btn btn-outline-dark border border-opacity-10 btn-sm" (click)="back()">Back <i
+						class="bi bi-arrow-left"></i></button>
+				<div>
+					<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+						<input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off"
+							(change)="setMode('pan')" value="pan" [(ngModel)]="mode">
+						<label class="btn btn-outline-dark border border-opacity-10 btn-sm" for="btnradio1"><i
+								class="bi bi-hand-index-thumb"></i> &nbsp;Drag</label>
+
+						<input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off"
+							(change)="setMode('zoom')" value="zoom" [(ngModel)]="mode">
+						<label class="btn btn-outline-dark border border-opacity-10 btn-sm" for="btnradio2"><i
+								class="bi bi-crop"></i> &nbsp;Inspect</label>
+					</div>
+
+					<button class="btn btn-outline-dark border border-opacity-10 btn-sm mx-1" (click)="download()"><i
+							class="bi bi-camera-fill"></i></button>
+
+					<button class="btn btn-outline-dark border border-opacity-10 btn-sm mx-1"
+						(click)="refresh()">Refresh</button>
+					<button class="btn btn-outline-dark border border-opacity-10 btn-sm" data-bs-toggle="collapse"
+						data-bs-target="#expandView" aria-expanded="false" aria-controls="collapseExample"
+						(click)="resizeWindow()"><i class="bi bi-arrows-expand-vertical"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="collapse collapse-horizontal show" id="expandView">
+		<div id="sidebar" class="ps-2">
+			<div class="p-3 rounded-3 shadow bg-white my-3">
+				<div class="fw-medium">PROCESSING</div>
+				<div class="d-flex justify-content-between my-2">
+					<div class="fw-medium">Remove DC</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+					</div>
+				</div>
+
+				<div class="d-flex justify-content-between my-2">
+					<div class="fw-medium">Filter</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" data-bs-toggle="collapse"
+							data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="collapseExample">
+					</div>
+				</div>
+
+				<div id="filterCollapse" class="collapse">
+					<select class="form-select form-select-sm mb-2" aria-label="Small select example"
+						[(ngModel)]="filterType">
+						<option value="bpass">Band Pass</option>
+						<option value="hpass">High Pass</option>
+						<option value="lpass">Low Pass</option>
+					</select>
+					@if(filterType=='bpass' && (lreq!=undefined && hreq!=undefined) && (lreq>=hreq || (hreq-lreq<1.0))){
+						<div class="alert alert-danger p-2 mb-2" role="alert">
+						@if(lreq>=hreq){
+						L-freq must be less than H-freq
+						}
+						@else if(hreq-lreq<1.0){ Difference between L-freq and H-freq must be at least 1 Hz } </div>
+							}
+
+							<div class="d-flex gap-1">
+								@if(filterType=="bpass" || filterType=="hpass"){
+
+								<div class="border rounded">
+									<div class="text-smaller px-2 pb-0 pt-1">L-freq</div>
+									<input type="number" step="0.01" min="0"
+										class="form-control form-control-sm border-0 py-0 shadow-none"
+										placeholder="L-freq" [(ngModel)]="lreq" autocomplete="off">
+								</div>
+								}
+
+								@if(filterType=="bpass" || filterType=="lpass"){
+								<div class="border rounded">
+									<div class="text-smaller px-2 pb-0 pt-1">H-freq</div>
+									<input type="number" step="0.01" min="0"
+										class="form-control form-control-sm border-0 py-0 shadow-none"
+										placeholder="H-freq" [(ngModel)]="hreq" autocomplete="off">
+								</div>
+
+								}
+								<button type="button" class="btn btn-outline-primary btn-sm" (click)="applyFilter()"
+									[disabled]="filterType=='bpass' && ((lreq==undefined || hreq==undefined) ||  (lreq>=hreq || (hreq-lreq<1.0))) ? true : filterType=='lpass' && hreq==undefined?true:filterType=='hpass' && lreq==undefined?true:false">Apply
+									Filter</button>
+
+							</div>
+				</div>
+
+				<div class="d-flex justify-content-between mt-2">
+					<div class="fw-medium">Re-reference</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
+					</div>
+				</div>
+			</div>
+
+			<div class="p-3 rounded-3 shadow bg-white mb-3">
+				<div class="d-flex justify-content-between mt-2">
+					<div class="fw-medium mb-2">Annotation</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="annotateFlag"
+							(change)="setAnnotateMode()">
+					</div>
+				</div>
+
+				<div class="collapse" [ngClass]="{'show':annotateFlag}" id="collapseAnnotation">
+					<div class="d-flex gap-2">
+						<div class="border rounded flex-grow-1">
+							<div class="text-smaller px-2 pt-1 pb-0">Selected Description</div>
+							<select class="form-select form-select-sm border-0 pt-0 shadow-none"
+								aria-label="Floating label select example" [(ngModel)]="selectedDescription">
+								@for (desc of descriptions; track $index) {
+								<option [ngValue]="desc">{{desc.name}}</option>
+								}
+							</select>
+						</div>
+						<button class="btn btn-outline-primary border border-opacity-10 text-smaller" type="button"
+							data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
+							aria-controls="offcanvasExample">
+							<i class="bi bi-wrench"></i><br />Manage
+						</button>
+					</div>
+					@if(annotationError){
+					<div class="alert alert-danger p-2 my-2" role="alert">
+						Error applying annotations
+					</div>
+					}
+
+					@if(shapes.length>0){
+					<div id="annotationDiv"
+						class="overflow-y-auto p-2 bg-light mt-2 border border-5 rounded-3 border-light">
+						@for (shape of shapes; let i = $index; track i) {
+						<div class="rounded-3 shadow-sm bg-white p-2 mb-2 text-smaller d-flex justify-content-between">
+							<div>
+								Start : {{shape['x0']}} s<br />
+								End : {{shape['x1']}} s<br />
+								Description : {{shape['descriptionName']}}<br />
+								Identification : &nbsp;<span class="px-2 rounded"
+									[attr.style]="'background-color: '+shape['fillcolor']+';'"></span>
+							</div>
+							@if(shape.isApplied){
+							<span
+								class="rounded border border-outline-dark border-opacity-10 text-smaller py-1 px-2 align-self-start">Applied</span>
+							}
+							@else{
+							<button class="btn btn-outline-secondary border border-opacity-10 btn-sm align-self-start"
+								(click)="deleteAnnotation(i)"><i class="bi bi-trash3"></i></button>
+							}
+						</div>
+						}
+					</div>
+					<div class="mt-2 text-end">
+						<button class="btn btn-outline-primary btn-sm" (click)="applyAnnotation()">Apply</button>
+					</div>
+					}
+
+				</div>
+
+			</div>
+
+			<div class="p-3 rounded-3 shadow bg-white mb-3">
+				<div class="d-flex justify-content-between mt-2">
+					<div class="fw-medium mb-2">ICA</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" data-bs-toggle="collapse"
+							data-bs-target="#icaCollapse" aria-expanded="false" aria-controls="collapseExample">
+					</div>
+				</div>
+
+				<div class="collapse" id="icaCollapse">
+					@if(!isFilterEverApplied){
+					<div class="alert alert-primary p-2 my-2" role="alert">
+						The data has not been high-pass filtered. For good ICA performance, it should be high-pass
+						filtered (e.g., with a 1.0 Hz lower bound) before fitting ICA.
+					</div>
+					}
+
+					@if(n_comp!=undefined && n_comp>channels.length){
+					<div class="alert alert-danger p-2 my-2" role="alert">
+						Maxiumum components could only be {{channels.length}}
+					</div>
+					}
+
+					<div class="border rounded my-2">
+						<div class="text-smaller px-2 pb-0 pt-1">No. of components</div>
+						<input type="number" class="form-control form-control-sm border-0 py-0 shadow-none"
+							placeholder="No. of components" min="1" [max]="channels.length" [(ngModel)]="n_comp"
+							autocomplete="off">
+					</div>
+
+					<div class="border rounded mb-2">
+						<div class="text-smaller px-2 pb-0 pt-1">Max Iterations</div>
+						<input type="number" class="form-control form-control-sm border-0 py-0 shadow-none"
+							placeholder="Max Iterations" min="0" [(ngModel)]="max_iter" autocomplete="off">
+					</div>
+
+					<div class="border rounded">
+						<div class="text-smaller px-2 pb-0 pt-1">Random State</div>
+						<input type="number" class="form-control form-control-sm border-0 py-0 shadow-none"
+							placeholder="Random State" min="0" [(ngModel)]="random_state" autocomplete="off">
+					</div>
+
+					<div class="d-flex justify-content-between pt-2 align-items-center">
+						<div class="text-success text-smaller">
+							@if(icaApplied){
+							<i class="bi bi-check-circle-fill"></i> ICA applied
+							}
+						</div>
+						@if(icaApplied && !icaExcluded){
+						<button type="button" class="btn btn-outline-primary btn-sm" (click)="resetIca()">Reset</button>
+						}
+						@else if(!icaApplied) {
+						<button type="button" class="btn btn-outline-primary btn-sm" (click)="applyIca()"
+							[disabled]="n_comp==undefined || max_iter==undefined || random_state==undefined || (n_comp!=undefined && n_comp>channels.length)">Create
+							and Apply</button>
+						}
+					</div>
+
+					<div class="mt-4">
+						<label for="exampleFormControlInput1" class="form-label mb-1 text-small">Muscle Artifact
+							Indices</label>
+						<input type="text" class="form-control form-control-sm text-primary"
+							id="exampleFormControlInput1" placeholder="None" readonly [disabled]="!icaApplied"
+							[value]="preSelectedIdx">
+					</div>
+					<div class="mt-2">
+						<label for="exampleFormControlInput2" class="form-label mb-1 text-small">Exclude
+							Components</label>
+						<input type="text" class="form-control form-control-sm" id="exampleFormControlInput2"
+							placeholder="Eg. 2, 3, 4" [disabled]="!icaApplied" [(ngModel)]="rejectedIdx" autocomplete="off">
+					</div>
+
+					<div class="d-flex justify-content-between pt-2 align-items-center gap-2">
+						<div class="text-success text-smaller d-flex gap-2 align-items-center">
+							@if(icaExcluded){
+							<div><i class="bi bi-check-circle-fill"></i></div>
+							<div>Components Rejected</div>
+							}
+						</div>
+						@if(!icaExcluded){
+						<button type="button" class="btn btn-outline-primary btn-sm text-small" [disabled]="!icaApplied"
+							(click)="rejectIca()">Exclude and Apply</button>
+						}
+					</div>
+				</div>
+			</div>
+
+			<div class="p-3 rounded-3 shadow bg-white mb-3">
+				<div class="d-flex justify-content-between mt-2">
+					<div class="fw-medium">PROCESSING LOG</div>
+					<div class="form-check form-switch">
+						<input class="form-check-input" type="checkbox" role="switch" data-bs-toggle="collapse"
+							data-bs-target="#logCollapse" aria-expanded="false" aria-controls="collapseExample">
+					</div>
+				</div>
+				<div class="collapse pt-2" id="logCollapse">
+					@if(logs.length>0){
+					<div class="bg-dark text-white p-2 mb-2 code-block overflow-auto overflow-x-auto" id="codeBlock">
+						<code class="text-white text-nowrap">
+								@for (log of logs; track $index) {
+									{{log['date']}}<br/>
+									{{log['time']}}<br/>
+									Action : {{log['action']}}<br/>
+									Params ↓<br/>
+									@for (pair of log['params']; track $index) {
+										{{pair['key']}} :  {{pair['value']}}<br/>
+									}
+									------------------------------<br/>
+								}
+			
+							</code>
+					</div>
+					<div class="text-end pt-2">
+						<button type="button" class="btn btn-sm btn-outline-primary"
+							(click)="downloadLogsAsTxt()">Export</button>
+					</div>
+					}
+					@else{
+					<div class="text-center">
+						Nothing to see here
+					</div>
+					}
+				</div>
+			</div>
+
+			<div class="p-3 rounded-3 shadow bg-white mb-3">
+				<button class="btn btn-outline-primary text-small w-100 mb-2" [disabled]="!icaExcluded" (click)="exportRawObject()">Export</button>
+				<button class="btn btn-primary text-small w-100" [disabled]="!icaExcluded">Send to processing pipeline</button>
+			</div>
+
+		</div>
+	</div>
+
+	<div id="loader-overlay"
+		class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-25 d-flex justify-content-center align-items-center backdrop-blur"
+		[class.d-none]="!loading">
+		<img src="loading.gif" alt="Loading..." class="img-fluid rounded-5" id="loaderImg">
+	</div>
+</div>
+
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
+	<div class="offcanvas-header">
+		<h5 class="offcanvas-title" id="offcanvasExampleLabel">Manage Descriptions</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+	</div>
+	<div class="offcanvas-body">
+		<div class="d-flex gap-2">
+			<div>
+				<input type="color" class="form-control form-control-color form-control-sm" title="Choose your color"
+					[(ngModel)]="colourInput">
+			</div>
+			<input type="text" class="form-control form-control-sm" aria-label="Sizing example input"
+				aria-describedby="inputGroup-sizing-sm" placeholder="Description" autocomplete="off"
+				[(ngModel)]="descValue">
+			<button class="btn btn-outline-dark btn-sm border border-opacity-10"
+				(click)="addDescription(); descValue=''" [disabled]="descValue.length==0">Add</button>
+		</div>
+		<hr />
+		<div class="mt-3">
+			@for (desc of descriptions; let i = $index; track i) {
+			<div class="d-flex gap-2 align-items-center mt-3">
+				@if(desc.editable){
+				<div>
+					<input type="color" class="form-control form-control-color form-control-sm"
+						[(ngModel)]="desc.tempColour" title="Choose your color">
+				</div>
+				<div class="flex-grow-1">
+					<input type="text" class="form-control form-control-sm" [(ngModel)]="desc.tempValue">
+				</div>
+				<button class="btn btn-outline-dark border border-opacity-10 btn-sm" (click)="editDescription(i)"><i
+						class="bi bi-check2"></i></button>
+				<button class="btn btn-outline-dark border border-opacity-10 btn-sm"
+					(click)="desc.editable = false;desc.tempValue=desc.name; desc.tempColour = desc.colour"><i
+						class="bi bi-x-circle"></i></button>
+				}
+				@else {
+
+				<input type="color" class="form-control form-control-color form-control-sm bg-white"
+					[value]="desc.colour" title="Choose your color" disabled>
+				<div class="flex-grow-1">
+					<input type="text" class="form-control form-control-sm border-0 bg-white px-1 ms-2"
+						[value]="desc.name" disabled>
+				</div>
+				<button class="btn btn-outline-dark border border-opacity-10 btn-sm" (click)="desc.editable = true"><i
+						class="bi bi-pencil"></i></button>
+				<button class="btn btn-outline-dark border border-opacity-10 btn-sm" (click)="deleteDescription(i)"><i
+						class="bi bi-trash3"></i></button>
+				}
+			</div>
+			}
+		</div>
+	</div>

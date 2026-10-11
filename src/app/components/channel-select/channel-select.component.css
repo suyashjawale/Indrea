@@ -1,0 +1,17 @@
+.channelDiv {
+	height: 50vh;
+}
+
+.montage-view{
+	height: 44vh;
+	max-height: 44vh;
+}
+
+#proceed:disabled{
+	cursor: not-allowed;
+}
+
+#loadingImg{
+	width: 12rem;
+	height: 12rem;
+}

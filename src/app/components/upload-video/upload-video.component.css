@@ -1,0 +1,6 @@
+.timeline-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 10px;
+}

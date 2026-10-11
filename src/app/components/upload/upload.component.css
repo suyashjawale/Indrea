@@ -1,0 +1,24 @@
+.upldDiv {
+    /* height: 70vh; */
+    border: 1px solid gray;
+
+    .insideDiv {
+        border: 2px dashed rgb(161, 161, 161);
+
+        .upload-icon {
+            cursor: pointer;
+            max-height: 20rem;
+            transition: transform .2s;
+        }
+
+        .upload-icon:hover {
+            transform: scale(1.1);
+        }
+
+        
+
+        .upload-icon:disabled {
+            cursor: not-allowed;
+        }
+    }
+}

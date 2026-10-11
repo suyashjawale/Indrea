@@ -1,0 +1,18 @@
+<div class="timeline-container">
+  <div class="track-labels">
+    <div>🧠 EEG Track</div>
+    <div>🎥 Video Track</div>
+  </div>
+
+  <div class="timeline-bar" #timeline>
+    <!-- Crop handles -->
+    <div class="crop-handle start" [ngStyle]="{ left: startPercent + '%' }" (mousedown)="startDrag('start')"></div>
+    <div class="crop-handle end" [ngStyle]="{ left: endPercent + '%' }" (mousedown)="startDrag('end')"></div>
+
+    <!-- EEG and Video bars -->
+    <div class="track eeg" [ngStyle]="{ width: '100%' }"></div>
+    <div class="track video" [ngStyle]="{ width: '100%' }"></div>
+  </div>
+
+  <button class="btn btn-primary mt-3" (click)="submitCrop()">Crop Selected Range</button>
+</div>

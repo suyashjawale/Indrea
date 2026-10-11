@@ -1,0 +1,66 @@
+.side-div{
+  background-color: #71787E;
+}
+
+.imported-files{
+  width: 312px;
+  height: 438px;
+  background-color: #43484B;
+  border-radius: 8px;
+}
+
+.create-pipeline{
+  background-color : #E2E6EA;
+}
+
+.card {
+  border-radius: 12px;
+  background-color: #E2E6EA;
+}
+
+.badge {
+  font-size: 1rem;
+}
+
+.form-check-input {
+  cursor: pointer;
+}
+
+.input-group-text {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+input[type='number']::-webkit-inner-spin-button {
+  opacity: 1;
+}
+
+.vh-100 {
+  height: 100vh;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.border {
+  background-color: #f9f9f9;
+  color: #888;
+  font-style: italic;
+}
+
+.pipeline{
+  margin-left: auto;
+  width: 1132px;
+  height: 803px;
+  margin-right: auto;
+}
+
+.pipelineSteps.active {
+  color: #343739;
+  font-weight: 500;
+}
+
+.font-color{
+  color : #6C757D
+}

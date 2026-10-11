@@ -1,0 +1,745 @@
+<div class="d-flex vh-100 w-100 gap-3">
+  <div class="sidebar-s bg-secondary d-flex flex-column p-3 text-white">
+    <div
+      class="rounded p-3 flex-grow-1 mb-2 d-flex flex-column"
+      style="background-color: #43484b"
+    >
+      <div class="fw-medium text-smaller">Imported files</div>
+      <div class="text-small overflow-y-auto mt-2 flex-grow-1" #fileContainer>
+        @for(i of fileList;track $index){
+        <div
+          class="mb-2 p-2 rounded me-1 pointer"
+          [ngClass]="
+            file_data[currentFileIdx].uid == i.uid ? 'bg-selected' : 'bg-normal'
+          "
+          (click)="viewFile($index)"
+        >
+          {{ i.filename }}
+        </div>
+        }
+      </div>
+    </div>
+    <div class="border border-1 rounded p-3">
+      <div class="fw-medium text-smaller">Current File</div>
+      <div class="text-small">
+        <div class="mt-2">
+          File Name : {{ file_data[currentFileIdx].filename }}
+        </div>
+        <div class="mt-1">
+          Sampling Frequency : {{ file_data[currentFileIdx].sampling_freq }}
+        </div>
+        <div class="mt-1">
+          No. of samples : {{ file_data[currentFileIdx].no_of_samples }}
+        </div>
+        <div class="mt-1">
+          No. of channels : {{ file_data[currentFileIdx].no_of_channels }}
+        </div>
+        <div class="mt-1">
+          Channel Type : {{ file_data[currentFileIdx].channel_type }}
+        </div>
+        <button
+          class="btn btn-transparent btn-sm text-small border border-white text-white mt-3"
+          (click)="showChannels(file_data[currentFileIdx].channel_list)"
+        >
+          View Channels
+        </button>
+        <hr />
+        <div class="mt-1">TImestamp :</div>
+        <div class="mt-1">
+          {{ file_data[currentFileIdx].timestamp }}
+        </div>
+        <div class="mt-1">
+          UNIX start time : {{ file_data[currentFileIdx].unix_start_time }}
+        </div>
+        <div class="mt-1">
+          UNIX end time : {{ file_data[currentFileIdx].unix_end_time }}
+        </div>
+        <div class="mt-1">
+          Duration (sec) : {{ file_data[currentFileIdx].duration }}
+        </div>
+      </div>
+      <div class="d-flex justify-content-between mt-2">
+        <button
+          class="btn btn-transparent p-0 text-white border-0 btn-lg fs-3"
+          (click)="decrementFileIdx()"
+        >
+          <i class="bi bi-arrow-left-circle-fill"></i>
+        </button>
+        <button
+          class="btn btn-transparent p-0 text-white border-0 btn-lg fs-3"
+          (click)="incrementFileIdx()"
+        >
+          <i class="bi bi-arrow-right-circle-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  @if(showCreate){
+  <div class="d-flex align-items-center justify-content-center flex-grow-1">
+    <div class="create rounded-5 headline-color">
+      <div class="m-5">
+        <div class="fw-medium fs-3">
+          @if(!viewMode) { <i class="bi bi-plus-circle"></i> } &nbsp;
+          @if(editMode) { Update Pipeline } @else if(viewMode) { Pipeline }
+          @else { Create Pipeline }
+        </div>
+
+        <div class="d-flex my-5">
+          <div class="">
+            <div class="fw-medium">
+              <i class="bi bi-1-circle-fill text-primary"></i> &nbsp;Basic
+              Details
+            </div>
+            <div class="mt-4">
+              @if(showCreateTab2 || showCreateTab3){
+              <i class="bi bi-2-circle-fill text-primary"></i>
+              } @else {
+              <i class="bi bi-circle text-primary"></i>
+              } &nbsp;TIme Domain Features
+            </div>
+            <div class="mt-4">
+              @if(showCreateTab3){
+              <i class="bi bi-3-circle-fill text-primary"></i>
+              } @else {
+              <i class="bi bi-circle text-primary"></i>
+              } &nbsp;Frequency Domain Features
+            </div>
+          </div>
+          <div class="vr mx-5"></div>
+          <div class="flex-grow-1">
+            @if(showCreateTab1){
+            <h2 class="fw-medium mb-4">Basic details</h2>
+            <div class="fw-medium mb-1">Name of pipeline</div>
+            <input
+              type="text"
+              class="text-small text-secondary p-2 border-0 shadow-none rounded w-75"
+              [(ngModel)]="pipelineName"
+              placeholder="Enter pipeline name"
+              [readonly]="viewMode"
+            />
+
+            <div class="d-flex justify-content-between mt-3">
+              <h5 class="fw-medium mb-3 mt-5">Baseline</h5>
+              <div class="form-check form-switch mb-3 mt-5">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [(ngModel)]="Baseline"
+                  [disabled]="viewMode"
+                />
+              </div>
+            </div>
+            @if(Baseline){
+            <div class="row">
+              <div class="col">
+                <div class="fw-medium mb-1">Units</div>
+                <select
+                  class="form-select text-primary text-small p-2"
+                  [(ngModel)]="baselineUnit"
+                  [disabled]="viewMode"
+                >
+                  <option value="seconds">seconds</option>
+                  <option value="millseconds">milliseconds</option>
+                </select>
+              </div>
+              <div class="col">
+                <div class="fw-medium mb-1">Baseline Period (sec)</div>
+                <div class="mb-3">
+                  <input
+                    type="number"
+                    class="text-small text-secondary p-2 border-0 shadow-none rounded w-100"
+                    [(ngModel)]="baselineStart"
+                    placeholder="Start"
+                    [readonly]="viewMode"
+                  />
+                </div>
+                <div>
+                  <input
+                    type="number"
+                    class="text-small text-secondary p-2 border-0 shadow-none rounded w-100"
+                    [(ngModel)]="baselineEnd"
+                    placeholder="End"
+                    [readonly]="viewMode"
+                  />
+                </div>
+              </div>
+            </div>
+            }
+
+            <div class="text-end mt-5">
+              <button
+                class="btn btn-outline-primary px-5"
+                (click)="
+                  showCreate = false;
+                  showExtract = true;
+                  resetCreatePipelineForm()
+                "
+              >
+                Back
+              </button>
+              <button
+                class="btn btn-primary ms-2 px-5"
+                (click)="
+                  showCreateTab2 = true;
+                  showCreateTab1 = false;
+                  showCreateTab3 = false
+                "
+                [disabled]="pipelineName == ''"
+              >
+                Next
+              </button>
+            </div>
+            } @else if(showCreateTab2){
+            <div>
+              <h2 class="fw-medium mb-4">Time Domain Features</h2>
+              <div class="fw-medium mb-3">Choose features to be computed</div>
+              @for (feature of timeFeatures; let i = $index; track i) {
+              <div class="mb-2 pointer">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="feature.selected"
+                  class="text-small"
+                  [id]="'checkDefault' + i"
+                  [disabled]="viewMode"
+                />
+                &nbsp;&nbsp;
+                <label [for]="'checkDefault' + i" class="pointer">
+                  {{ feature.name }}
+                </label>
+              </div>
+              }
+
+              <div class="text-end">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="selectAllTimeFeatures"
+                  (change)="toggleSelectAllTimeFeatures()"
+                  class="text-small"
+                  id="selectAll"
+                  [disabled]="viewMode"
+                />
+                &nbsp;&nbsp;
+                <label for="selectAll" class="pointer"> Select All </label>
+              </div>
+
+              <div class="text-end mt-2">
+                <button
+                  class="btn btn-outline-primary px-5"
+                  (click)="
+                    showCreateTab3 = false;
+                    showCreateTab1 = true;
+                    showCreateTab2 = false
+                  "
+                >
+                  Back
+                </button>
+                <button
+                  class="btn btn-primary ms-2 px-5"
+                  (click)="
+                    showCreateTab3 = true;
+                    showCreateTab1 = false;
+                    showCreateTab2 = false
+                  "
+                  [disabled]="!isAnyTimeFeatureSelected()"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+            } @else if(showCreateTab3){
+            <div>
+              <h2 class="fw-medium mb-4">Frequency Domain Features</h2>
+              <div class="row g-5">
+                <div class="col">
+                  <div class="fw-medium mb-3">Frequency Bands</div>
+
+                  <div class="overflow-y-auto pe-1" style="max-height: 42vh">
+                    @for(band of frequencyBands; let i = $index; track i){
+                    <div class="d-flex gap-2 mb-2 align-items-center mb-3">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="band.selected"
+                        [disabled]="viewMode"
+                      />
+                      <div class="bg-white rounded">
+                        <div class="text-x-small px-2 pb-0 pt-1">
+                          {{ band.label }} - Lower
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          class="form-control form-control-sm border-0 py-0 shadow-none bg-transparent text-small text-muted"
+                          [(ngModel)]="band.lower"
+                          placeholder="Low"
+                          autocomplete="off"
+                          [readonly]="viewMode"
+                        />
+                      </div>
+
+                      <span class="text-small">Hz&nbsp;&nbsp;:&nbsp;</span>
+
+                      <div class="bg-white rounded">
+                        <div class="text-x-small px-2 pb-0 pt-1">
+                          {{ band.label }} - Upper
+                        </div>
+                        <input
+                          type="number"
+                          min="0"
+                          class="form-control form-control-sm border-0 py-0 shadow-none bg-transparent text-small text-muted"
+                          [(ngModel)]="band.upper"
+                          placeholder="High"
+                          autocomplete="off"
+                          [readonly]="viewMode"
+                        />
+                      </div>
+
+                      <span class="text-small">Hz</span>
+                    </div>
+                    }
+                  </div>
+                  <button
+                    class="btn bg-white text-muted text-small shadow-none border-0 py-2 w-100"
+                    (click)="addFrequencyBand()"
+                    [disabled]="viewMode"
+                  >
+                    + Add a band
+                  </button>
+                </div>
+                <div class="col">
+                  <div class="fw-medium mb-3">Band Power Estimation</div>
+                  <div class="fw-medium mb-1 text-small">
+                    Epoch Equal Duration (sec)
+                  </div>
+                  <input
+                    type="number"
+                    class="text-small text-secondary p-2 border-0 shadow-none rounded w-100 mb-4"
+                    [(ngModel)]="epochDuration"
+                    placeholder="End"
+                    min="0"
+                    [readonly]="viewMode"
+                  />
+
+                  <div class="fw-medium mb-1 text-small">
+                    Calculation method
+                  </div>
+                  <select
+                    class="form-select text-primary text-small p-2"
+                    [(ngModel)]="calculationMethod"
+                    [disabled]="viewMode"
+                  >
+                    <option value="Multitaper">Multitaper</option>
+                    <option value="Welch">Welch</option>
+                  </select>
+
+                  <div class="d-flex justify-content-between mt-3">
+                    <div class="text-small fw-medium">Reject by annotation</div>
+                    <div class="form-check form-switch">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        [(ngModel)]="rejectAnnotation"
+                        [disabled]="viewMode"
+                      />
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-between mt-2">
+                    <div class="text-small fw-medium">Relative Power</div>
+                    <div class="form-check form-switch">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        [(ngModel)]="relativePower"
+                        [disabled]="viewMode"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="text-end mt-4">
+                <button
+                  class="btn btn-outline-primary px-5"
+                  (click)="
+                    showCreateTab3 = false;
+                    showCreateTab1 = false;
+                    showCreateTab2 = true
+                  "
+                >
+                  Back
+                </button>
+
+                @if(viewMode) {
+                <button
+                  class="btn btn-secondary ms-2 px-5"
+                  (click)="
+                    showCreate = false;
+                    showExtract = true;
+                    resetCreatePipelineForm()
+                  "
+                >
+                  Close
+                </button>
+                } @else {
+                <button
+                  class="btn btn-primary ms-2 px-5"
+                  (click)="createPipeline()"
+                  [disabled]="
+                    !isAnyfrequencyBandsSelected() || epochDuration < 0
+                  "
+                >
+                  {{ editMode ? "Update Pipeline" : "Create Pipeline" }}
+                </button>
+                }
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  } @else if(showExtract){
+  <div style="width: 20rem; max-width: 20 rem" class="headline-color">
+    <div style="height: 8vh">
+      <button
+        class="btn btn-sm w-100 mt-3 btn-outline-primary"
+        (click)="showCreate = true"
+      >
+        <i class="bi bi-plus-circle"></i> &nbsp;Create New Pipeline
+      </button>
+    </div>
+    <div
+      style="height: 90vh; background-color: #e2e6ea"
+      class="border overflow-y-auto p-3 rounded-2 mb-5"
+    >
+      <div class="fs-5 fw-medium" style="height: 5vh; max-height: 5vh">
+        Feature extraction
+      </div>
+
+      <div style="height: 24vh; max-height: 24vh">
+        <div class="text-x-small fw-medium mb-1">
+          Select pipeline and files to extract EEG features
+        </div>
+
+        <div class="p-3 pe-1 bg-white rounded text-dark">
+          <div style="height: 15vh; max-height: 15vh" class="overflow-y-auto">
+            @for (p of pipelines; track $index) {
+            <div
+              class="p-2 d-flex rounded me-2 align-items-center pointer"
+              [ngClass]="pipelines.length - 1 == $index ? 'mb-0' : 'mb-2'"
+              style="background-color: #e9f4ff"
+            >
+              <input
+                type="radio"
+                name="pip"
+                class="me-2"
+                [value]="p.basic_details.name"
+                [(ngModel)]="selectedPipeline"
+              />
+              <div class="text-small fw-medium flex-grow-1">
+                {{ p.basic_details.name }}
+              </div>
+              <div class="d-flex gap-1">
+                <div class="text-primary pointer" (click)="editPipeline(p)">
+                  <i class="bi bi-pencil-square icon"></i>
+                </div>
+                <div class="text-primary pointer" (click)="viewPipeline(p)">
+                  <i class="bi bi-box-arrow-in-up-right icon"></i>
+                </div>
+                <div class="text-primary pointer" (click)="promptDelete(p)">
+                  <i class="bi bi-trash icon"></i>
+                </div>
+              </div>
+            </div>
+            } @empty {
+            <div
+              class="d-flex align-items-center justify-content-center h-100 w-100 text-center text-muted fw-medium"
+            >
+              Please create a new pipeline!
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 27.5vh; max-height: 27.5vh">
+        <div class="text-x-small fw-medium d-flex justify-content-between mb-1">
+          <div>Select files for extracting features</div>
+          <div class="d-flex">
+            <input
+              class="form-check-input me-1"
+              type="checkbox"
+              [(ngModel)]="selectAllFif"
+              (change)="selectAllFiles()"
+            />
+            <label class="form-check-label" for="checkChecked">
+              Select&nbsp;All
+            </label>
+          </div>
+        </div>
+
+        <div class="p-3 pe-1 bg-white rounded text-dark">
+          <div style="height: 18vh; max-height: 18vh" class="overflow-y-auto">
+            @for (p of fileList; track $index) {
+            <div
+              class="p-2 d-flex rounded me-2 align-items-center pointer"
+              [ngClass]="fileList.length - 1 == $index ? 'mb-0' : 'mb-2'"
+              style="background-color: #e9f4ff"
+            >
+              <input
+                type="checkbox"
+                name="radio"
+                class="me-2"
+                [(ngModel)]="p.isSelected"
+              />
+              <div class="text-small fw-medium flex-grow-1">
+                {{ p.filename }}
+              </div>
+              <div class="text-primary pointer" (click)="promptDeleteFile(p)">
+                <i class="bi bi-trash icon"></i>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div style="height: 12vh; max-height: 12vh">
+        <div class="fw-medium mb-1">Type of Analysis</div>
+        <select
+          class="form-select text-primary text-small mb-1"
+          aria-label="Default select example"
+        >
+          <option value="1">Full Signal</option>
+        </select>
+        <div class="text-x-small fw-medium">
+          Full features will be considered for extraction of features
+        </div>
+      </div>
+
+      <button
+        class="btn btn-primary w-100"
+        (click)="extractFeatures()"
+        [disabled]="!isAnyFilesSelected() || resultState == 'loading'"
+      >
+        Extract Features
+      </button>
+    </div>
+  </div>
+
+  @if(resultState=="loaded"){
+  <div class="flex-grow-1 ps-0 p-3 headline-color">
+    <div style="background-color: #e2e6ea" class="rounded-2 h-100 p-3">
+      <div class="h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-3">
+          @if(keys.length>1){
+          <button
+            class="btn btn-outline-primary bg-transparent p-0 border-0 btn-lg fs-3"
+            (click)="decrementMainWindowIdx()"
+            (click)="
+              plotBandPowerChart(
+                result[keys[selectedMainIdx]][selectedTask][selectedChannel][
+                  'band_power'
+                ]
+              )
+            "
+          >
+            <i class="bi bi-arrow-left-circle"></i>
+          </button>
+          <button
+            class="btn btn-outline-primary bg-transparent p-0 border-0 btn-lg fs-3"
+            (click)="incrementMainWindowIdx()"
+            (click)="
+              plotBandPowerChart(
+                result[keys[selectedMainIdx]][selectedTask][selectedChannel][
+                  'band_power'
+                ]
+              )
+            "
+          >
+            <i class="bi bi-arrow-right-circle"></i>
+          </button>
+          }
+
+          <div class="fs-3 fw-medium">
+            {{ getCurrentFileName(keys[selectedMainIdx]) }}
+          </div>
+          <div class="ms-auto d-flex gap-3">
+            <select
+              class="form-select text-primary"
+              aria-label="Default select example"
+              style="width: 10rem"
+              [(ngModel)]="selectedTask"
+              (change)="
+                plotBandPowerChart(
+                  result[keys[selectedMainIdx]][selectedTask][selectedChannel][
+                    'band_power'
+                  ]
+                )
+              "
+            >
+              <option value="baseline">Baseline</option>
+              <option value="sketching">Sketching</option>
+            </select>
+            <select
+              class="form-select text-primary"
+              aria-label="Default select example"
+              [(ngModel)]="selectedChannel"
+              (change)="
+                plotBandPowerChart(
+                  result[keys[selectedMainIdx]][selectedTask][selectedChannel][
+                    'band_power'
+                  ]
+                )
+              "
+            >
+              @for(item of eeg_channels; track $index) {
+              <option [value]="item">{{ item }}</option>
+              }
+            </select>
+            <button
+              class="btn btn-primary d-flex"
+              (click)="downloadExcelReport()"
+            >
+              <i class="bi bi-arrow-down-circle"></i>&nbsp;&nbsp;Download
+            </button>
+          </div>
+        </div>
+        <div class="flex-grow-1 d-flex gap-3 mt-3">
+          <div class="d-flex flex-column">
+            <div class="fw-medium">Time domain Features</div>
+            <div class="fw-medium text-x-small">Statistical features</div>
+            <div class="bg-white rounded-2 p-3 flex-grow-1 mt-3">
+              @for (item of
+              getObjectKeys(result[keys[selectedMainIdx]][selectedTask][selectedChannel]['time_domain']);
+              track $index) {
+              <div class="d-flex justify-content-between text-small mb-3 gap-5">
+                <div>
+                  {{
+                    item.charAt(0).toUpperCase() +
+                      item.slice(1).replace("_", " ")
+                  }}
+                </div>
+                <div
+                  class="text-primary"
+                  [innerHTML]="
+                    formatExponent(
+                      result[keys[selectedMainIdx]][selectedTask][
+                        selectedChannel
+                      ]['time_domain'][item]
+                    ) +
+                    ' ' +
+                    getUnit(item)
+                  "
+                ></div>
+              </div>
+              }
+
+              <!-- @for (item of timeFeatures; track $index) {
+							<div class="d-flex justify-content-between text-small mb-3 gap-5">
+								<div>{{item.name}}</div>
+								<div class="text-primary">0.4 uV<sup>2</sup></div>
+							</div>
+							} -->
+            </div>
+          </div>
+          <div class="flex-grow-1 d-flex flex-column">
+            <div class="fw-medium">Frquency Domain Features</div>
+            <div class="fw-medium text-x-small">
+              Power Spectral Density Plot
+            </div>
+            <!-- <div class="bg-white mt-3 rounded p-3 flex-grow-1">a</div> -->
+            <div class="bg-white mt-3 rounded p-3 flex-grow-1">
+              <div id="spectralPlot" style="width: 100%; height: 100%"></div>
+            </div>
+            <div class="d-flex mt-3 gap-3">
+              <div class="text-small bg-white rounded p-3">
+                @for (item of
+                result[keys[selectedMainIdx]][selectedTask][selectedChannel]['band_power'];
+                track $index) {
+                <div class="d-flex justify-content-between mb-3 gap-5">
+                  <div>
+                    {{ item[0].charAt(0).toUpperCase() + item[0].slice(1) }} (0
+                    to 4Hz)
+                  </div>
+                  <div class="text-primary">
+                    {{ item[1] | number : "1.2-2" }} μV
+                  </div>
+                </div>
+                }
+              </div>
+              <div class="text-small bg-white rounded p-1 flex-grow-1">
+                <div id="bandPowerChart" class="h-100 w-100"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div class="flex-grow-1 ps-0 p-3 headline-color">
+    <div class="d-flex align-items-center justify-content-center h-100">
+      @if(resultState=="initial"){
+      <div>Click Extract Features to extract</div>
+      } @else if(resultState=="failed"){
+      <div>Failed</div>
+      } @else if(resultState=="loading"){
+
+      <img
+        src="loading.gif"
+        alt="Loading..."
+        class="img-fluid rounded-5"
+        id="loaderImg"
+      />
+      <div>
+        Estimated Processing Time : {{ 0.57 * fileList.length }} minutes
+      </div>
+
+      }
+    </div>
+  </div>
+  } }
+</div>
+@if(showDeleteConfirmPipeline){
+<div
+  class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+  style="background-color: rgba(0, 0, 0, 0.5); z-index: 1050"
+>
+  <div class="bg-white rounded-4 p-4 shadow-lg text-dark" style="width: 22rem">
+    <h5 class="fw-medium mb-3">Delete Pipeline</h5>
+    <p class="mb-4">
+      Are you sure you want to delete
+      <strong>{{ selectedPipelineName }}</strong> pipeline ? This action cannot
+      be undone.
+    </p>
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary" (click)="cancelDelete()">
+        Cancel
+      </button>
+      <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+} @if(showDeleteConfirmFile){
+<div
+  class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+  style="background-color: rgba(0, 0, 0, 0.5); z-index: 1050"
+>
+  <div class="bg-white rounded-4 p-4 shadow-lg text-dark" style="width: 22rem">
+    <h5 class="fw-medium mb-3">Delete File</h5>
+    <p class="mb-4">
+      Are you sure you want to delete
+      <strong>{{ selectedFileName }}</strong
+      >? This action cannot be undone.
+    </p>
+    <div class="d-flex justify-content-end gap-2">
+      <button class="btn btn-outline-secondary" (click)="cancelDeleteFile()">
+        Cancel
+      </button>
+      <button class="btn btn-danger" (click)="confirmDeleteFile()">
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+}

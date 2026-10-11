@@ -1,0 +1,328 @@
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 text-white p-3 side-div">
+      <div class="list-group mb-3 imported-files">
+         <h5>Imported files</h5>
+        @for(file of allFiles; let i = $index; track i){
+          {{ file }}
+        }
+      </div>
+
+      <div id="fileCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          @for(file of selectedFiles; let i = $index; track i){
+          <div class="carousel-item" [class.active]="i === 0">
+            <div class="card bg-secondary text-white p-2">
+              <p><strong>File Name:</strong> {{ file }}</p>
+              <p>
+                <strong>Sampling frequency:</strong>
+                {{ fileMetadata[file]?.sampling_frequency || 0 }} Hz
+              </p>
+              <p>
+                <strong>No. of samples:</strong>
+                {{ fileMetadata[file]?.samples || 0 }}
+              </p>
+              <p>
+                <strong>No. of channels:</strong>
+                {{ fileMetadata[file]?.channels || 0 }}
+              </p>
+              <p>
+                <strong>Channel type:</strong>
+                {{ fileMetadata[file]?.type || "N/A" }}
+              </p>
+            </div>
+          </div>
+          }
+        </div>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#fileCarousel"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#fileCarousel"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Area -->
+    <div class="col-md-9">
+      @if(step === 'pipeline'){
+      <div class="p-4">
+        <div class="card pipeline p-4">
+          <h4 class="font-color">+ Create pipeline</h4>
+          <div class="d-flex">
+            <div>
+              <ol class="ps-3 d-grid gap-0 row-gap-3">
+                <li class="pipelineSteps font-color" [class.active]="pipelineStep == 1">Basic details</li>
+                <li class="pipelineSteps font-color" [class.active]="pipelineStep == 2">Time domain features</li>
+                <li class="pipelineSteps font-color" [class.active]="pipelineStep == 3">Frequency domain features</li>
+              </ol>
+            </div>
+
+            @if(pipelineStep === 1){
+            <div>
+              <h5 class="font-color">Basic details</h5>
+              <div class="mb-3">
+                <label class="font-color">Name of pipeline</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="pipelineName"
+                  placeholder="Enter pipeline name"
+                />
+              </div>
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [(ngModel)]="useBaseline"
+                />
+                <label class="form-check-label font-color"> Baseline</label>
+              </div>
+              <div class="row mt-2">
+                <div class="col-md-6">
+                  <label class="font-color">Units</label>
+                  <select class="form-select" [(ngModel)]="baselineUnit">
+                    <option value="seconds">seconds</option>
+                    <option value="millseconds">milliseconds</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="font-color">Baseline Period(secs)</label>
+                  <div class="d-flex gap-2">
+                    <input
+                      type="number"
+                      class="form-control"
+                      [(ngModel)]="baselineStart"
+                      placeholder="Start"
+                    />
+                    <input
+                      type="number"
+                      class="form-control"
+                      [(ngModel)]="baselineEnd"
+                      placeholder="End"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="text-end mt-4">
+                <button class="btn btn-secondary me-2" (click)="prevStep()">
+                  Cancel
+                </button>
+                <button class="btn btn-primary" (click)="nextStep()">
+                  Next
+                </button>
+              </div>
+            </div>
+            } @if(pipelineStep === 2){
+            <div>
+              <h5 class="font-color">Time domain features</h5>
+              <div class="mt-3">
+                <p class="font-color">Choose features to be computed</p>
+                <div class="row font-color">
+                  @for(feature of timeFeatures; let i = $index; track i){
+                  <div class="col-md-6 mb-2">
+                    <label>
+                      <input type="checkbox" [(ngModel)]="feature.selected" />
+                      {{ feature.name }}
+                    </label>
+                  </div>
+                  }
+                </div>
+
+                <div class="form-check mt-3">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="selectAllTimeFeatures"
+                    (change)="toggleSelectAllTimeFeatures()"
+                  />
+                  <label class="form-check-label font-color">Select all</label>
+                </div>
+              </div>
+              <div class="text-end mt-4">
+                <button class="btn btn-secondary me-2" (click)="prevStep()">
+                  Back
+                </button>
+                <button class="btn btn-primary" (click)="nextStep()">
+                  Next
+                </button>
+              </div>
+            </div>
+            } 
+              @if(pipelineStep === 3){
+              <div>
+                <h5 class="font-color">Frequency domain features</h5>
+                <div class="mt-3">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6 class="font-color">Frequency Bands</h6>
+                      @for(band of frequencyBands; let i = $index; track i){
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <input type="checkbox" [(ngModel)]="band.selected" />
+                        <input
+                          type="text"
+                          class="form-control"
+                          [(ngModel)]="band.label"
+                          style="width: 60px"
+                        />
+                        <input
+                          type="number"
+                          class="form-control"
+                          [(ngModel)]="band.lower"
+                          placeholder="Low"
+                        />
+                        <span>Hz</span>
+                        <input
+                          type="number"
+                          class="form-control"
+                          [(ngModel)]="band.upper"
+                          placeholder="High"
+                        />
+                        <span>Hz</span>
+                      </div>
+                      }
+                      <button
+                        class="btn btn-outline-secondary font-color"
+                        (click)="addFrequencyBand()"
+                      >
+                        + Add a band
+                      </button>
+                    </div>
+
+                    <div class="col-md-6 font-color">
+                      <h6 >Band Power Estimation</h6>
+                      <label>Equal epoch duration (sec)</label>
+                      <input
+                        type="number"
+                        class="form-control mb-2"
+                        [(ngModel)]="epochDuration"
+                      />
+
+                      <label>Calculation method</label>
+                      <select
+                        class="form-select mb-2"
+                        [(ngModel)]="calculationMethod"
+                      >
+                        <option value="Multitaper">Multitaper</option>
+                        <option value="Welch">Welch</option>
+                      </select>
+
+                      <div class="form-check form-switch">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          [(ngModel)]="rejectAnnotation"
+                        />
+                        <label class="form-check-label"
+                          >Reject by annotation</label
+                        >
+                      </div>
+                      <div class="form-check form-switch">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          [(ngModel)]="relativePower"
+                        />
+                        <label class="form-check-label">Relative Power</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-4">
+                    <button class="btn btn-secondary me-2" (click)="prevStep()">
+                      Back
+                    </button>
+                    <button class="btn btn-primary" (click)="createPipeline()">
+                      Create Pipeline
+                    </button>
+                  </div>
+                </div>
+              </div>
+              }
+          </div>
+        </div>
+      </div>
+      }
+
+      @if(step === 'extract'){
+      <div class="p-4">
+        <div class="card p-4 mb-3">
+          <h5>Feature extraction</h5>
+          <p class="text-muted">
+            Select pipeline and files to extract EEG features
+          </p>
+          <label>Pipeline</label>
+          <select class="form-select mb-2" [(ngModel)]="selectedPipeline">
+            @for(p of pipelines; let i = $index; track i){
+            <option [value]="p.filename">{{ p.filename }}</option>
+            }
+          </select>
+
+          <label>Files</label>
+          @for(file of allFiles; track file){
+          <div>
+            <input type="checkbox" [(ngModel)]="selectedFiles" [value]="file" />
+            {{ file }}
+          </div>
+          }
+
+          <button
+            class="btn btn-primary mt-3"
+            (click)="extractFeatures()"
+            [disabled]="isExtracting"
+          >
+            @if(isExtracting){
+            <span
+              class="spinner-border spinner-border-sm me-2"
+              role="status"
+            ></span>
+            Extracting... } @else { Extract features }
+          </button>
+        </div>
+
+        @if(showPlots){
+        <div class="card p-4">
+          <h6 class="mb-3">Time domain features</h6>
+          <ul class="list-group mb-4">
+            @for(f of features; track f.name){
+            <li class="list-group-item d-flex justify-content-between">
+              <span>{{ f.name }}</span>
+              <span class="text-primary">{{ f.value }}</span>
+            </li>
+            }
+          </ul>
+
+          <h6>Frequency domain features</h6>
+          <div class="mb-3">
+            <label>Channel</label>
+            <select class="form-select" (change)="updateChannel($event)">
+              @for(ch of channels; track ch){
+              <option [value]="ch">{{ ch }}</option>
+              }
+            </select>
+          </div>
+
+          <h6 class="mt-3">PSD Plot</h6>
+          <img [src]="psdImageUrl" class="img-fluid border rounded" />
+
+          <h6 class="mt-4">Band Power Plot</h6>
+          <img [src]="barImageUrl" class="img-fluid border rounded" />
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

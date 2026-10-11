@@ -1,0 +1,114 @@
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+
+	<div class="border rounded-4 w-100 p-3">
+		<div class="mb-3"><span class="fw-medium">Selected Files : </span>
+			@for (item of selected_files; track $index) {
+				<span>{{ item }}&nbsp;, </span>
+			}
+			@empty {
+				--
+			}
+		</div>
+		<div class="mb-3"><span class="fw-medium">Rejected Files : </span>
+			@for (item of rejected_files; track $index) {
+				<span>{{ item }}&nbsp;, </span>
+			}
+			@empty {
+				--
+			}
+			</div>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="fs-5 fw-medium">Select channels</div>
+				<div class="mb-2"> These cannels will be visible in your plot</div>
+
+				<div class="overflow-auto channelDiv border p-3 rounded-3">
+					@for(ch of channels ; track i ; let i = $index){
+
+					<div class="form-check mb-2">
+						<input class="form-check-input" type="checkbox" [attr.id]="'flexCheckChecked'+i"
+							[(ngModel)]="checkbox[i]" [ngModelOptions]="{standalone: true}">
+						<label class="form-check-label" [attr.for]="'flexCheckChecked'+i">
+							{{ch}}
+							@if(eegChannels.includes(ch)){
+							<span class="bg-success text-white text-x-small px-2 py-1 rounded ms-2">EEG</span>
+							}
+						</label>
+					</div>
+					} @empty {
+					<div>No File Available</div>
+					}
+				</div>
+				<div class="d-flex justify-content-end my-2 text-smaller">
+					<div class="form-check">
+						<input class="form-check-input" type="radio" name="radioDefault" id="radioDefault1"
+							(change)="toggleSelection(1)" [disabled]="!checkbox.includes(true)">
+						<label class="form-check-label" for="radioDefault1">
+							None
+						</label>
+					</div>
+					<div class="form-check pointer ms-2">
+						<input class="form-check-input pointer" type="radio" name="radioDefault" id="radioDefault2"
+							(change)="toggleSelection(2)">
+						<label class="form-check-label pointer" for="radioDefault2">
+							Select EEG
+						</label>
+					</div>
+					<div class="form-check pointer ms-2">
+						<input class="form-check-input pointer" type="radio" name="radioDefault" id="radioDefault3"
+							(change)="toggleSelection(3)">
+						<label class="form-check-label pointer" for="radioDefault3">
+							Select All
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="fs-5 fw-medium">Electrode Placement</div>
+				<div class="d-flex flex-column">
+					<div class="mb-2">Select electrodes</div>
+					<div class="d-flex">
+						<select class="form-select" aria-label="select example" [(ngModel)]="selectedMontage">
+							@for (item of montage_types; track $index) {
+								<option [value]="item">{{item}}</option>
+							}
+						</select>
+						<button class="btn btn-success ms-1" (click)="setMontage()" [disabled]="disableProceed || !checkbox.includes(true)">Visualize</button>
+					</div>
+					<div class="text-center py-3">
+						@if(imageLoaded==1){
+							<img [src]="sensorPlotUrl" class="img-fluid montage-view" />
+						}
+						@else if(imageLoaded==2){
+							<div class="d-flex justify-content-center align-items-center montage-view">
+								<img src="loading.gif" class="img-fluid" id="loadingImg" />
+							</div>
+						}
+						@else if(imageLoaded==3){
+							<div class="montage-view d-flex justify-content-center align-items-center text-smaller">
+								{{sensorPlotUrl}}
+							</div>
+						}
+						@else {
+							<div class="montage-view d-flex justify-content-center align-items-center text-smaller">
+								Click visualize to map positions and proceed
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="text-end mt-3 d-flex justify-content-between">
+			<button class="btn btn-outline-primary" (click)="back()">Back <i class="bi bi-arrow-left"></i></button>
+			<button class="btn btn-primary" (click)="proceed()" id="proceed" [disabled]="disableProceed || imageLoaded!=1">
+				@if(disableProceed){
+					<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+				}
+				@else{
+					Proceed <i class="bi bi-arrow-right"></i>
+				}
+			</button>
+		</div>
+
+	</div>
+</div>

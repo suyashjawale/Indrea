@@ -1,0 +1,31 @@
+#bg-div {
+	background-color: #FAFAFA !important;
+	font-size: smaller;
+}
+
+.bg-gray {
+	background-color: gray;
+}
+
+.code-block {
+	max-height: 10rem !important;
+}
+
+#sidebar {
+	min-width: 19rem;
+	max-width: 19rem;
+}
+
+#codeBlock::-webkit-scrollbar {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+#codeBlock::-webkit-scrollbar-thumb {
+	background: rgb(182, 182, 182);
+	border-radius: 0px;
+}
+
+#annotationDiv{
+	max-height: 20rem;
+}

@@ -1,0 +1,16 @@
+.select-task{
+    width: 201px;
+    height: 214px;
+    box-shadow: 3px 3px 12px #00000039;
+    opacity: 1;
+}
+
+.select-task :hover {
+    box-shadow: 3px 3px 12px #00000039;
+    border: 2px solid #0982FC;
+    opacity: 1;
+}
+
+.mat-tooltip:after {
+  border-top-color: #333 !important;
+}

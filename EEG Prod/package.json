@@ -1,0 +1,53 @@
+{
+	"name": "brasig",
+	"version": "1.0.6",
+	"main": "main.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Brasig",
+	"license": "ISC",
+	"description": "Eeg app",
+	"build": {
+		"appId": "com.brasig.indrea",
+		"productName": "Brasig",
+		"files": [
+			"main.js",
+			"!app/**",
+			"brain.gif",
+			"splash.html",
+			"bootstrap.min.css",
+			"!exeBuild/server.exe",
+			"!node_modules/**/*",
+			"!package.json",
+			"!package-lock.json",
+			"!brain.ico"
+		],
+		"extraResources": [
+			{
+				"from": "exeBuild/server.exe",
+				"to": "server.exe"
+			},
+			{
+				"from": "app",
+				"to": "app"
+			}
+		],
+		"directories": {
+			"output": "installerBuild"
+		},
+		"win": {
+			"target": "nsis",
+			"icon": "brain.ico"
+		},
+		"nsis": {
+			"oneClick": false,
+			"perMachine": true,
+			"allowToChangeInstallationDirectory": true
+		}
+	},
+	"devDependencies": {
+		"electron": "^36.5.0",
+		"electron-builder": "^26.0.12"
+	}
+}

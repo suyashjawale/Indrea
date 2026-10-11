@@ -1,0 +1,18 @@
+<div class="container-fluid">
+	<div class="vh-100 sticky-top py-3">
+		<div class="d-flex flex-column p-3 shadow-lg h-100 w-100 rounded-3">
+			<div class="fw-medium text-smaller">
+				Cascaded time series of individual ICA components
+			</div>
+			<div class="flex-grow-1 h-100 w-100 border rounded-3 mt-2">
+				<div id="icaTimeseries" class="h-100 w-100"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="loader-overlay"
+	class="position-fixed top-0 start-0 w-100 h-100 bg-opacity-25 d-flex justify-content-center align-items-center backdrop-blur"
+	[class.d-none]="!loading">
+	<img src="loading.gif" alt="Loading..." class="img-fluid rounded-5" id="loaderImg">
+</div>

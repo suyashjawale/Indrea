@@ -1,0 +1,40 @@
+<div class="container-fluid">
+  <div class="row vh-100">
+    <div class="col-md-5 d-flex align-items-center justify-content-center bg-dark text-white">
+      <div class="text-center">
+        <h2>Welcome to <br><strong>Brasig Analyzer</strong></h2>
+        <img src="assets/brain.png" class="img-fluid mt-4" style="max-height: 300px" />
+      </div>
+    </div>
+    <div class="col-md-7 p-5">
+      <h4 class="mb-4">+ Create new process</h4>
+      <div class="d-flex gap-4 mb-5">
+        <button class="btn btn-outline-secondary p-4 select-task" (click)="startProcess('upload-edf')">
+          <i class="bi bi-brain"></i> <br />Clean EEG signal
+        </button>
+        <button class="btn btn-outline-secondary p-4 select-task" (click)="startProcess('upload-fif')">
+          <i class="bi bi-graph-up"></i> <br />Extract EEG features
+        </button>
+        <button class="btn btn-outline-secondary p-4 select-task" mat-raised-button matTooltipPosition="right" matTooltip="Coming soon!">
+          <i class="bi bi-camera-video"></i> <br />Sync Video with EEG
+        </button>
+      </div>
+      <!-- <h5>Recent</h5>
+      <table class="table table-borderless">
+        <thead>
+          <tr><th>NAME</th><th>RECENT</th><th>SIZE</th><th>TYPE</th></tr>
+        </thead>
+        <tbody>
+          @for(p of recentProjects ; track p){
+          <tr>
+            <td>{{ p.name }}</td>
+            <td>{{ p.recent }}</td>
+            <td>{{ p.size }}</td>
+            <td>{{ p.type }}</td>
+          </tr>
+        }
+        </tbody>
+      </table> -->
+    </div>
+  </div>
+</div>

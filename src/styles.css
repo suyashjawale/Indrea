@@ -1,0 +1,56 @@
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/500.css';
+
+body {
+	font-family: 'Poppins', sans-serif;
+}
+
+.text-small {
+	font-size: small;
+}
+
+.text-x-small {
+	font-size: x-small;
+}
+
+.text-smaller {
+	font-size: smaller;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+::-webkit-scrollbar {
+	width: 0.5rem;
+	height: 0.5rem;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+	background: rgb(182, 182, 182);
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar-corner{
+	background-color: transparent;
+}
+
+#loader-overlay {
+	z-index: 1100;
+	transition: opacity 0.3s ease;
+}
+
+.backdrop-blur {
+	backdrop-filter: blur(5px);
+}
+
+#loaderImg{
+	width: 8rem;
+	height: 8rem;
+	/* animation: rotation 2s infinite linear;  */
+}
+
+@keyframes rotation {
+	100%{ transform:rotatey(360deg); }
+  }

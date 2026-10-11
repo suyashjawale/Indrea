@@ -1,0 +1,32 @@
+.sidebar-s {
+	width: 17rem;
+}
+
+.create {
+	background-color: #E2E6EA;
+	display: block;
+	height: 87vh;
+	width: 80%;
+}
+
+.bg-selected {
+	background-color: rgb(0, 0, 0);
+}
+
+.bg-normal {
+	background-color: rgb(56, 56, 56);
+}
+
+.headline-color {
+	color: #6C757D;
+}
+
+input {
+	outline: none;
+}
+
+.icon:hover {
+	cursor: pointer;
+	transition: color 0.2s ease;
+	opacity: 0.5;
+}

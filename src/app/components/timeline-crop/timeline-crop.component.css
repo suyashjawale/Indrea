@@ -1,0 +1,55 @@
+.timeline-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.track-labels {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.timeline-bar {
+  position: relative;
+  height: 60px;
+  background: #eee;
+  margin-top: 10px;
+}
+
+.track {
+  position: absolute;
+  height: 20px;
+  background-color: lightblue;
+  margin-top: 10px;
+}
+
+.track.eeg {
+  top: 0;
+  background-color: lightgreen;
+}
+
+.track.video {
+  top: 30px;
+  background-color: #7ec0ee;
+}
+
+.crop-handle {
+  position: absolute;
+  width: 6px;
+  height: 100%;
+  background: red;
+  cursor: ew-resize;
+  z-index: 9999;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+}
+
+.timeline-bar {
+  position: relative;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.track.eeg { background-color: lightgreen; }
+.track.video { background-color: #7ec0ee; }
+

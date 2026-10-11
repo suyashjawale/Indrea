@@ -1,0 +1,100 @@
+{
+	"name": "eeg-poc",
+	"version": "0.0.0",
+	"main": "main.js",
+	"scripts": {
+		"ng": "ng",
+		"start": "ng serve --open",
+		"build": "ng build --base-href ./",
+		"electron": "npm run build && npm run build-server && electron .",
+		"build-server": "pyinstaller --name=server --distpath=exeBuild --noconsole --onefile --paths=python --additional-hooks-dir=python --hidden-import=scipy.io --hidden-import=scipy.interpolate --hidden-import=scipy.signal --hidden-import=decorator --hidden-import=matplotlib.backends.backend_agg python/server.py",
+		"build-client": "npm run build && electron-packager . client --platform=win32 --arch=x64 --out=portableBuild --overwrite --ignore=\"(.angular|.vscode|node_modules|src|public|scripts|build|commands.txt|server.spec|.editorconfig|.gitignore|angular.json|package-lock.json|README.md|tsconfig.app.json|tsconfig.json|tsconfig.spec.json|python)\"",
+		"build-client-mac": "npm run build && electron-packager . client --platform=darwin --arch=x64 --out=portableBuildMac --overwrite --ignore=\"(.angular|.vscode|node_modules|src|public|scripts|build|commands.txt|server.spec|.editorconfig|.gitignore|angular.json|package-lock.json|README.md|tsconfig.app.json|tsconfig.json|tsconfig.spec.json|python)\"",
+		"build-portable": "npm run build-server && npm run build-client",
+		"build-installer": "npm run build && npm run build-server && npx electron-builder --win --x64",
+		"build-installer-mac": "npm run build && npm run build-server && npx electron-builder --darwin --x64"
+	},
+	"private": true,
+	"dependencies": {
+		"@angular/cdk": "^19.2.18",
+		"@angular/common": "^19.2.0",
+		"@angular/compiler": "^19.2.0",
+		"@angular/core": "^19.2.0",
+		"@angular/forms": "^19.2.0",
+		"@angular/material": "^19.2.18",
+		"@angular/platform-browser": "^19.2.0",
+		"@angular/platform-browser-dynamic": "^19.2.0",
+		"@angular/router": "^19.2.0",
+		"@fontsource/poppins": "^5.2.5",
+		"bootstrap": "^5.3.3",
+		"bootstrap-icons": "^1.11.3",
+		"chart.js": "^4.5.0",
+		"eeg-poc": "file:",
+		"file-saver": "^2.0.5",
+		"jszip": "^3.10.1",
+		"ndarray": "^1.0.19",
+		"npyjs": "^0.7.0",
+		"numpy-parser": "^1.2.3",
+		"pako": "^2.1.0",
+		"plotly.js-dist": "^3.0.1",
+		"rxjs": "~7.8.0",
+		"tslib": "^2.3.0",
+		"wavesurfer.js": "^7.9.5",
+		"xlsx": "^0.18.5",
+		"zone.js": "~0.15.0"
+	},
+	"devDependencies": {
+		"@angular-devkit/build-angular": "^19.2.1",
+		"@angular/cli": "^19.2.1",
+		"@angular/compiler-cli": "^19.2.0",
+		"@types/bootstrap": "^5.2.10",
+		"@types/file-saver": "^2.0.7",
+		"@types/jasmine": "~5.1.0",
+		"@types/ndarray": "^1.0.14",
+		"@types/pako": "^2.0.3",
+		"electron": "^35.0.1",
+		"electron-builder": "^25.1.8",
+		"electron-packager": "^17.1.2",
+		"jasmine-core": "~5.6.0",
+		"karma": "~6.4.0",
+		"karma-chrome-launcher": "~3.2.0",
+		"karma-coverage": "~2.2.0",
+		"karma-jasmine": "~5.1.0",
+		"karma-jasmine-html-reporter": "~2.1.0",
+		"typescript": "~5.7.2"
+	},
+	"build": {
+		"appId": "com.eeg.poc",
+		"productName": "EEG",
+		"asar": true,
+		"files": [
+			"main.js",
+			"exeBuild/server.exe",
+			{
+				"from": "dist/eeg-poc/browser",
+				"to": "dist",
+				"filter": [
+					"**/*"
+				]
+			}
+		],
+		"extraResources": [
+			{
+				"from": "exeBuild/server.exe",
+				"to": "server.exe"
+			}
+		],
+		"directories": {
+			"output": "installerBuild"
+		},
+		"win": {
+			"target": "nsis",
+			"icon": "public/eeg.ico"
+		},
+		"nsis": {
+			"oneClick": false,
+			"perMachine": true,
+			"allowToChangeInstallationDirectory": true
+		}
+	}
+}

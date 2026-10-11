@@ -1,0 +1,12 @@
+pyinstaller --name=server --distpath=exeBuild --onefile --paths=python --additional-hooks-dir=python --hidden-import=mne --hidden-import=scipy --hidden-import=decorator --hidden-import=numpy --hidden-import=gzip --hidden-import=matplotlib --hidden-import=matplotlib.pyplot python/server.py
+
+
+
+pyinstaller --name=server --distpath=exeBuild --noconsole --onefile --paths=python --additional-hooks-dir=python --collect-all mne --collect-all scipy --collect-all matplotlib --collect-all decorator --collect-all numpy --collect-submodules scipy --collect-submodules matplotlib python/server.py
+
+pyinstaller --name=server --distpath=exeBuild --noconsole --onefile --paths=python --additional-hooks-dir=python --hidden-import sklearn --hidden-import sklearn.utils._openmp_helpers --hidden-import sklearn.decomposition._fastica --hidden-import=scipy.io --hidden-import=scipy.interpolate --hidden-import=scipy.signal --hidden-import=decorator --hidden-import=matplotlib.backends.backend_agg python/server.py
+
+
+pyinstaller --name=server --distpath=exeBuild --onefile python/main.py
+
+npx asar extract installerBuild/win-unpacked/resources/app.asar app-unpacked

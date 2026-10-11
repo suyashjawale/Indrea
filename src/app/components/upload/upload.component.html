@@ -1,0 +1,40 @@
+<div class="container vh-100 d-flex align-items-center justify-content-center" (dragover)="onDragOver($event)"
+	(drop)="onDrop($event)">
+	<div class="upldDiv rounded-4 p-3 w-100">
+		<div class="insideDiv rounded h-100 w-100 rounded-3 p-3 d-flex flex-column justify-content-around text-center">
+
+			<div (click)="triggerFileInput()" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+				<img src="upload-icon.png" alt="Upload Icon" class="upload-icon img-fluid">
+				<input type="file" accept=".edf" #fileInput hidden [disabled]="!notUploading"
+					(change)="onFileSelected($event)" />
+			</div>
+
+			<div class="fs-6 fw-medium py-3">
+				Click on the image to upload the file or drag your file here
+			</div>
+			<div class="py-3">
+				@if(notUploading){
+				<button class="btn btn-primary" (click)="uploadFile()" [disabled]="!selectedFile">Upload</button>
+				}
+				@else {
+				<div class="spinner-border text-success" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+				}
+			</div>
+			<div class="py-3">
+				@if(selectedFile){
+				<div class="text-success">
+					<span class="fw-medium">Selected File:</span> {{ selectedFile.name }}
+				</div>
+				}
+				@else if(apiError){
+				<div class="text-danger fw-medium">Error Reading EDF File</div>
+				}
+				@else{
+				&nbsp;
+				}
+			</div>
+		</div>
+	</div>
+</div>
